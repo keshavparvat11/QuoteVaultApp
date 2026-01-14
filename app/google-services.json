@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "942534741192",
+    "project_id": "quotevault-8bb90",
+    "storage_bucket": "quotevault-8bb90.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:942534741192:android:b65f1ceb646705863569fd",
+        "android_client_info": {
+          "package_name": "com.example.quotevault"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqAKvkxRh_js-87431D8S4e9KjDOwe03c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
