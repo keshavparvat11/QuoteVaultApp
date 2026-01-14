@@ -49,11 +49,24 @@ android {
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+
     //Firebase
     implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
-    implementation("com.google.firebase:firebase-analytics")
 
+// Firebase Core (required)
+    implementation("com.google.firebase:firebase-common-ktx:21.0.0")
+
+    // Firebase Auth
+    implementation("com.google.firebase:firebase-auth-ktx:23.0.0")
+
+    // Firebase Firestore
+    implementation("com.google.firebase:firebase-firestore-ktx:25.0.0")
+
+    // (Optional) Firebase Analytics
+    implementation("com.google.firebase:firebase-analytics-ktx:22.0.2")
 
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.7.4")

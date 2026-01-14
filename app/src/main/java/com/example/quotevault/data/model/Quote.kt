@@ -1,5 +1,5 @@
 package com.example.quotevault.data.model
-
+import kotlinx.serialization.json.Json
 import java.time.LocalDateTime
 
 data class Quote(
