@@ -16,6 +16,7 @@ class UserPreferencesRepository @Inject constructor(
     companion object {
         private val THEME_KEY = stringPreferencesKey("theme")
         private val NOTIFICATION_TIME_KEY = stringPreferencesKey("notification_time")
+        val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
         private val FONT_SIZE_KEY = stringPreferencesKey("font_size")
         private val ACCENT_COLOR_KEY = stringPreferencesKey("accent_color")
 
@@ -36,7 +37,16 @@ class UserPreferencesRepository @Inject constructor(
             Theme.valueOf(preferences[THEME_KEY] ?: DEFAULT_THEME)
         }
     }
+    override fun isNotificationsEnabled(): Flow<Boolean> =
+        dataStore.data.map {
+            it[NOTIFICATIONS_ENABLED] ?: true
+        }
 
+    override suspend fun setNotificationsEnabled(enabled: Boolean) {
+        dataStore.edit {
+            it[NOTIFICATIONS_ENABLED] = enabled
+        }
+    }
     override suspend fun setNotificationTime(time: String) {
         dataStore.edit { preferences ->
             preferences[NOTIFICATION_TIME_KEY] = time

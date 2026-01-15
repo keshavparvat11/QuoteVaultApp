@@ -37,6 +37,7 @@ import com.example.quotevault.data.model.UserPreferences
 import com.example.quotevault.notification.NotificationScheduler
 import com.example.quotevault.quotes.QuoteRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -117,24 +118,31 @@ fun SettingsScreen(
 
             // Notifications
             SettingsCategory(title = "Notifications") {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        Text("Daily Quote")
+                        Text(
+                            if (notificationsEnabled)
+                                "Enabled • $notificationTime"
+                            else
+                                "Disabled",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
 
-                SettingsItem(
-                    icon = Icons.Default.Notifications,
-                    title = "Daily Quote",
-                    subtitle = if (notificationsEnabled)
-                        "Enabled • $notificationTime"
-                    else
-                        "Disabled",
-                    onClick = {}
-                )
-
-                Switch(
-                    checked = notificationsEnabled,
-                    onCheckedChange = {
-                        viewModel.toggleNotifications(context, it)
-                    },
-                    modifier = Modifier.padding(start = 16.dp, bottom = 16.dp)
-                )
+                    Switch(
+                        checked = notificationsEnabled,
+                        onCheckedChange = {
+                            viewModel.toggleNotifications(context, it)
+                        }
+                    )
+                }
             }
 
             // Account
@@ -371,26 +379,29 @@ class SettingsViewModel @Inject constructor(
     val theme: StateFlow<Theme> = _theme.asStateFlow()
 
     private val _notificationTime = MutableStateFlow("09:00")
-    val notificationTime: StateFlow<String> = _notificationTime.asStateFlow()
+
     private val _notificationsEnabled = MutableStateFlow(true)
-    val notificationsEnabled: StateFlow<Boolean> = _notificationsEnabled.asStateFlow()
-    private val _fontSize = MutableStateFlow(FontSize.MEDIUM)
-    val fontSize: StateFlow<FontSize> = _fontSize.asStateFlow()
-    fun toggleNotifications(
-        context: Context,
-        enabled: Boolean
-    ) {
+
+
+    val notificationsEnabled = userPreferences.isNotificationsEnabled()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), true)
+
+    val notificationTime = userPreferences.getNotificationTime()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "09:00")
+
+    fun toggleNotifications(context: Context, enabled: Boolean) {
         viewModelScope.launch {
-            userPreferences.setNotificationEnabled(enabled)
+            userPreferences.setNotificationsEnabled(enabled)
 
             if (enabled) {
-                val (h, m) = notificationTime.value.split(":").map { it.toInt() }
-                NotificationScheduler.scheduleDailyQuote(context, h, m)
+                NotificationScheduler.scheduleDailyQuote(context, 9, 0)
             } else {
-                //NotificationScheduler.cancelDailyQuote(context)
+                NotificationScheduler.cancelDailyQuote(context)
             }
         }
     }
+    private val _fontSize = MutableStateFlow(FontSize.MEDIUM)
+    val fontSize: StateFlow<FontSize> = _fontSize.asStateFlow()
 
     private val _accentColor = MutableStateFlow(AccentColor.PURPLE)
     val accentColor: StateFlow<AccentColor> = _accentColor.asStateFlow()

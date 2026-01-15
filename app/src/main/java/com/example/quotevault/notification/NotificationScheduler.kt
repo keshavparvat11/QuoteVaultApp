@@ -40,4 +40,8 @@ object NotificationScheduler {
                 request
             )
     }
+    fun cancelDailyQuote(context: Context) {
+        WorkManager.getInstance(context)
+            .cancelUniqueWork("daily_quote")
+    }
 }

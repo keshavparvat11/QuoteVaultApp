@@ -4,9 +4,11 @@ package com.example.quotevault.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.sp
 import com.example.quotevault.data.model.AccentColor
 import com.example.quotevault.data.model.FontSize
@@ -84,28 +86,42 @@ fun QuoteVaultTheme(
                 primary = Color(0xFFF44336)
             )
     }
+    val baseTypography = Typography()
 
-    val typography = when (fontSize) {
-        FontSize.SMALL -> Typography(
-            bodyLarge = TextStyle(fontSize = 14.sp)
-        )
-
-        FontSize.MEDIUM -> Typography()
-
-        FontSize.LARGE -> Typography(
-            bodyLarge = TextStyle(fontSize = 18.sp)
-        )
-
-        FontSize.XLARGE -> Typography(
-            bodyLarge = TextStyle(fontSize = 22.sp)
-        )
+    val scaledTypography = when (fontSize) {
+        FontSize.SMALL -> baseTypography.scale(0.9f)
+        FontSize.MEDIUM -> baseTypography
+        FontSize.LARGE -> baseTypography.scale(1.15f)
+        FontSize.XLARGE -> baseTypography.scale(1.3f)
     }
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = typography,
+        typography = scaledTypography,
         content = content
     )
 }
 
 
+
+fun Typography.scale(factor: Float): Typography =
+    Typography(
+        displayLarge = displayLarge.scale(factor),
+        displayMedium = displayMedium.scale(factor),
+        displaySmall = displaySmall.scale(factor),
+        headlineLarge = headlineLarge.scale(factor),
+        headlineMedium = headlineMedium.scale(factor),
+        headlineSmall = headlineSmall.scale(factor),
+        titleLarge = titleLarge.scale(factor),
+        titleMedium = titleMedium.scale(factor),
+        titleSmall = titleSmall.scale(factor),
+        bodyLarge = bodyLarge.scale(factor),
+        bodyMedium = bodyMedium.scale(factor),
+        bodySmall = bodySmall.scale(factor),
+        labelLarge = labelLarge.scale(factor),
+        labelMedium = labelMedium.scale(factor),
+        labelSmall = labelSmall.scale(factor)
+    )
+
+private fun TextStyle.scale(factor: Float): TextStyle =
+    if (fontSize.isUnspecified) this else copy(fontSize = fontSize * factor)

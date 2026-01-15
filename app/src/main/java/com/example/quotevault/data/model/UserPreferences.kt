@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 interface UserPreferences {
     suspend fun setTheme(theme: Theme)
      fun getTheme(): Flow<Theme>
+    fun isNotificationsEnabled(): Flow<Boolean>
+    suspend fun setNotificationsEnabled(enabled: Boolean)
 
     suspend fun setNotificationTime(time: String)
      fun getNotificationTime(): Flow<String>
