@@ -6,7 +6,17 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("androidx.room")
     id("com.google.gms.google-services")
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.22"
 }
+fun getLocalProperty(key: String): String {
+    return project.findProperty(key)?.toString()
+        ?: throw GradleException(
+            "Missing $key in local.properties. Please define it."
+        )
+}
+
+val supabaseUrl = getLocalProperty("SUPABASE_URL")
+val supabaseAnonKey = getLocalProperty("SUPABASE_ANON_KEY")
 
 android {
     namespace = "com.example.quotevault"
@@ -20,6 +30,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
+
     }
 
     buildTypes {
@@ -42,6 +55,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     room {
         schemaDirectory("$projectDir/schemas")
@@ -86,9 +100,9 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.0")
 
     // Supabase
-    implementation("io.github.jan-tennert.supabase:supabase-kt:2.2.1")
-    implementation("io.github.jan-tennert.supabase:gotrue-kt:2.2.1")
-    implementation("io.github.jan-tennert.supabase:postgrest-kt:2.2.1")
+    implementation("io.github.jan-tennert.supabase:supabase-kt:2.4.0")
+    implementation("io.github.jan-tennert.supabase:gotrue-kt:2.6.1")
+    implementation("io.github.jan-tennert.supabase:postgrest-kt:2.4.0")
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")

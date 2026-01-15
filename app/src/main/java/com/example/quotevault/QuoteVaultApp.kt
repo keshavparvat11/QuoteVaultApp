@@ -7,6 +7,6 @@ import dagger.hilt.android.HiltAndroidApp
 class QuoteVaultApp : Application(){
     override fun onCreate() {
         super.onCreate()
-        // Initialize any app-wide configurations here
+
     }
 }

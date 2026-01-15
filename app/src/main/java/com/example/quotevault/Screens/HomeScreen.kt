@@ -71,16 +71,7 @@ fun HomeScreen(
             ) {
                 Icon(Icons.Default.Favorite, contentDescription = "Favorites")
             }
-            FloatingActionButton(
-                onClick = {
-                    viewModel.seedTestQuote()
 
-                },
-                modifier = Modifier.size(40.dp),
-                containerColor = MaterialTheme.colorScheme.secondary
-            ) {
-                Text("+", fontSize = 16.sp)
-            }
         }
     ) { paddingValues ->
         SwipeRefresh(

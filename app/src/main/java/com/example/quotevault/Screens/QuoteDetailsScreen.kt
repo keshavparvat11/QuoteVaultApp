@@ -26,6 +26,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.quotevault.data.model.Quote
+import com.example.quotevault.data.model.QuoteCategory
 import com.example.quotevault.quotes.QuoteRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -159,7 +160,6 @@ fun QuoteDetailContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Quote Info
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -177,9 +177,20 @@ fun QuoteDetailContent(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                InfoRow(label = "Category", value = quote.category.displayName)
-                InfoRow(label = "Tags", value = quote.tags.joinToString(", "))
-                InfoRow(label = "Likes", value = quote.likes.toString())
+                InfoRow(
+                    label = "Category",
+                    value = QuoteCategory.fromString(quote.category).displayName
+                )
+
+                InfoRow(
+                    label = "Tags",
+                    value = quote.tags?.joinToString(", ") ?: "—"
+                )
+
+                InfoRow(
+                    label = "Likes",
+                    value = quote.likes.toString()
+                )
             }
         }
     }

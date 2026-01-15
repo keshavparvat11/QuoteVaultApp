@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quotevault.quotes.QuoteRepository
 
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -53,12 +54,16 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             try {
-                val result = repository.signIn(_uiState.value.email, _uiState.value.password)
+                val result = repository.signIn(
+                    _uiState.value.email,
+                    _uiState.value.password
+                )
                 if (result.isSuccess) {
                     _uiState.value = _uiState.value.copy(isLoggedIn = true)
                     onSuccess()
                 } else {
-                    _uiState.value = _uiState.value.copy(error = result.exceptionOrNull()?.message)
+                    _uiState.value =
+                        _uiState.value.copy(error = result.exceptionOrNull()?.message)
                 }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(error = e.message)
@@ -81,7 +86,8 @@ class AuthViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(isLoggedIn = true)
                     onSuccess()
                 } else {
-                    _uiState.value = _uiState.value.copy(error = result.exceptionOrNull()?.message)
+                    _uiState.value =
+                        _uiState.value.copy(error = result.exceptionOrNull()?.message)
                 }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(error = e.message)
@@ -102,7 +108,8 @@ class AuthViewModel @Inject constructor(
                         error = "Password reset email sent!"
                     )
                 } else {
-                    _uiState.value = _uiState.value.copy(error = result.exceptionOrNull()?.message)
+                    _uiState.value =
+                        _uiState.value.copy(error = result.exceptionOrNull()?.message)
                 }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(error = e.message)

@@ -2,6 +2,7 @@ package com.example.quotevault.Screens
 
 
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quotevault.data.model.Quote
@@ -109,6 +110,7 @@ class HomeViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _error.value = e.message
+                Log.d("HomeViewModel", "Error loading quotes: ${e.message}")
             } finally {
                 _isLoading.value = false
             }

@@ -87,8 +87,15 @@ fun QuoteCard(
                 FilterChip(
                     selected = false,
                     onClick = { /* Navigate to category */ },
-                    label = { Text(quote.category.displayName) }
+                    label = {
+                        Text(
+                            QuoteCategory
+                                .fromString(quote.category)
+                                .displayName
+                        )
+                    }
                 )
+
 
                 Row {
                     IconButton(onClick = onFavoriteClick) {

@@ -1,26 +1,23 @@
 package com.example.quotevault.data.model
 
-import com.google.firebase.Timestamp
-import com.google.firebase.firestore.PropertyName
-import kotlinx.serialization.json.Json
-import java.time.LocalDateTime
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Quote(
     val id: String = "",
     val content: String = "",
     val author: String = "",
-    val category: QuoteCategory = QuoteCategory.MOTIVATION,
-    val tags: List<String> = emptyList(),
+    val category: String = "MOTIVATION",
+    val tags: List<String>? = emptyList(),
     val likes: Int = 0,
-    val createdAt: Timestamp? = null,
-    @get:PropertyName("isFeatured")
-    @set:PropertyName("isFeatured")
-    var isFeatured: Boolean = false,
-) {
-    companion object {
-        val empty = Quote()
-    }
-}
+    @SerialName("is_featured")
+    val isFeatured: Boolean = false,
+    @SerialName("created_at")
+    val createdAt: String = ""
+)
+
 
 enum class QuoteCategory(
     val displayName: String,
