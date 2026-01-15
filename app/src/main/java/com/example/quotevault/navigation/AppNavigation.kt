@@ -18,21 +18,24 @@ import androidx.compose.runtime.getValue
 import com.example.quotevault.Screens.QuoteDetailScreen
 import com.example.quotevault.Screens.SearchScreen
 import com.example.quotevault.Screens.SettingsScreen
+import com.example.quotevault.Screens.SplashScreen
 import com.example.quotevault.auth.AuthUiState
-
-
 
 @Composable
 fun AppNavigation(
-    modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
     val authViewModel: AuthViewModel = hiltViewModel()
-    val isLoggedIn by authViewModel.uiState.collectAsState()
+    val uiState by authViewModel.uiState.collectAsState()
 
-    // Listen for auth state changes
-    LaunchedEffect(isLoggedIn.isLoggedIn) {
-        if (isLoggedIn.isLoggedIn && navController.currentDestination?.route == "auth") {
+    /** Check auth once when app starts */
+    LaunchedEffect(Unit) {
+        authViewModel.checkAuthState()
+    }
+
+    /** Redirect automatically */
+    LaunchedEffect(uiState.isLoggedIn) {
+        if (uiState.isLoggedIn) {
             navController.navigate("home") {
                 popUpTo("auth") { inclusive = true }
             }
@@ -41,35 +44,22 @@ fun AppNavigation(
 
     NavHost(
         navController = navController,
-        startDestination = if (isLoggedIn.isLoggedIn) "home" else "auth",
-        modifier = modifier
+        startDestination = if (uiState.isLoggedIn) "home" else "auth"
     ) {
         composable("auth") {
-            AuthScreen(navController = navController)
+            AuthScreen(navController)
         }
-
         composable("home") {
-            HomeScreen(navController = navController)
+            HomeScreen(navController)
         }
-
-        composable("quote/{quoteId}") { backStackEntry ->
-            val quoteId = backStackEntry.arguments?.getString("quoteId") ?: ""
-            QuoteDetailScreen(
-                quoteId = quoteId,
-                navController = navController
-            )
-        }
-
         composable("favorites") {
-            FavoritesScreen(navController = navController)
+            FavoritesScreen(navController)
         }
-
         composable("search") {
-            SearchScreen(navController = navController)
+            SearchScreen(navController)
         }
-
         composable("settings") {
-            SettingsScreen(navController = navController)
+            SettingsScreen(navController)
         }
     }
 }

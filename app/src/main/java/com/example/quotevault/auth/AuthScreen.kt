@@ -49,13 +49,7 @@ fun AuthScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // Logo/Title
-                Icon(
-                    painter = painterResource(R.drawable.ic_launcher_background),
-                    contentDescription = "QuoteVault",
-                    modifier = Modifier.size(80.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
+
 
                 Spacer(modifier = Modifier.height(16.dp))
 

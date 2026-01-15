@@ -5,7 +5,6 @@ plugins {
     id("com.google.devtools.ksp") version "2.0.21-1.0.26"
     id("com.google.dagger.hilt.android")
     id("androidx.room")
-    id("com.google.gms.google-services")
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.22"
 }
 fun getLocalProperty(key: String): String {
@@ -67,23 +66,11 @@ dependencies {
     implementation(libs.firebase.crashlytics.buildtools)
     implementation(libs.androidx.palette.ktx)
     implementation(libs.generativeai)
-
+    implementation("androidx.compose.material:material-icons-extended")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
     implementation("com.google.accompanist:accompanist-swiperefresh:0.31.5-beta")
     //Firebase
     implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
-
-// Firebase Core (required)
-    implementation("com.google.firebase:firebase-common-ktx:21.0.0")
-
-    // Firebase Auth
-    implementation("com.google.firebase:firebase-auth-ktx:23.0.0")
-
-    // Firebase Firestore
-    implementation("com.google.firebase:firebase-firestore-ktx:25.0.0")
-
-    // (Optional) Firebase Analytics
-    implementation("com.google.firebase:firebase-analytics-ktx:22.0.2")
 
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.7.4")

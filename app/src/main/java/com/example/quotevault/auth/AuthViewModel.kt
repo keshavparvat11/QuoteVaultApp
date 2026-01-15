@@ -6,7 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.quotevault.quotes.QuoteRepository
 
 import androidx.lifecycle.viewModelScope
+import com.example.quotevault.data.remote.SupabaseProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.jan.supabase.gotrue.auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,16 +23,23 @@ class AuthViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
-    init {
-        checkAuthState()
-    }
 
-    private fun checkAuthState() {
+    private val _isLoggedIn = MutableStateFlow<Boolean?>(null)
+    val isLoggedIn: StateFlow<Boolean?> = _isLoggedIn.asStateFlow()
+
+
+    /** Call this explicitly from UI */
+    fun checkAuthState() {
         viewModelScope.launch {
-            val currentUser = repository.getCurrentUser()
-            _uiState.value = _uiState.value.copy(
-                isLoggedIn = currentUser != null
-            )
+            runCatching {
+                repository.getCurrentUser()
+            }.onSuccess { user ->
+                _uiState.value = _uiState.value.copy(
+                    isLoggedIn = user != null
+                )
+            }.onFailure {
+                _uiState.value = _uiState.value.copy(isLoggedIn = false)
+            }
         }
     }
 
@@ -96,7 +105,6 @@ class AuthViewModel @Inject constructor(
             }
         }
     }
-
     fun resetPassword() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)

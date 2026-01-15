@@ -1,10 +1,13 @@
 package com.example.quotevault
 
+import android.Manifest
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -15,6 +18,7 @@ import androidx.core.view.WindowCompat.enableEdgeToEdge
 import androidx.navigation.compose.rememberNavController
 import com.example.quotevault.data.remote.testSupabaseConnection
 import com.example.quotevault.navigation.AppNavigation
+import com.example.quotevault.notification.DailyQuoteNotification
 import com.example.quotevault.ui.theme.QuoteVaultTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,7 +29,16 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val permissionLauncher = rememberLauncherForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) {}
 
+            LaunchedEffect(Unit) {
+                if (Build.VERSION.SDK_INT >= 33) {
+                    permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+            DailyQuoteNotification.createChannel(this)
             QuoteVaultTheme {
                 AppNavigation()
             }

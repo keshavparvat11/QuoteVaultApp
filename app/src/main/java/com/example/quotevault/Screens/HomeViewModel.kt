@@ -8,15 +8,16 @@ import androidx.lifecycle.viewModelScope
 import com.example.quotevault.data.model.Quote
 import com.example.quotevault.data.model.QuoteCategory
 import com.example.quotevault.data.model.UserPreferences
-import com.example.quotevault.data.seedQuotes
+
+
 import com.example.quotevault.quotes.QuoteRepository
-import com.google.firebase.firestore.FirebaseFirestore
+
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
+
 import javax.inject.Inject
 
 @HiltViewModel
@@ -171,11 +172,6 @@ class HomeViewModel @Inject constructor(
     fun refresh() {
         loadQuotes()
         loadDailyQuote()
-    }
-    fun seedTestQuote() {
-        viewModelScope.launch {
-            seedQuotes()
-        }
     }
 
 }

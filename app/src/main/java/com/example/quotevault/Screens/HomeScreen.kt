@@ -37,10 +37,8 @@ import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.example.quotevault.R
 import com.example.quotevault.Screens.component.SearchBar
 import com.example.quotevault.data.model.Quote
-import com.google.firebase.firestore.FirebaseFirestore
 
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -18,6 +18,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
@@ -28,6 +29,7 @@ import com.example.quotevault.data.model.FontSize
 import com.example.quotevault.data.model.Theme
 
 import com.example.quotevault.data.model.UserPreferences
+import com.example.quotevault.notification.NotificationScheduler
 import com.example.quotevault.quotes.QuoteRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -45,6 +47,7 @@ fun SettingsScreen(
     val notificationTime by viewModel.notificationTime.collectAsState()
     val fontSize by viewModel.fontSize.collectAsState()
     val accentColor by viewModel.accentColor.collectAsState()
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -108,8 +111,10 @@ fun SettingsScreen(
                 SettingsItem(
                     icon = Icons.Default.Notifications,
                     title = "Daily Quote",
-                    subtitle = "Get notified at $notificationTime",
-                    onClick = { /* Open time picker */ }
+                    subtitle = "Get notified at 09:00",
+                    onClick = {  NotificationScheduler.scheduleDailyQuote(
+                        context = context, hour = 9, minute = 0
+                    )}
                 )
             }
 
