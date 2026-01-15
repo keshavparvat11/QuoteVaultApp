@@ -31,7 +31,7 @@ class UserPreferencesRepository @Inject constructor(
         }
     }
 
-    override suspend fun getTheme(): Flow<Theme> {
+    override  fun getTheme(): Flow<Theme> {
         return dataStore.data.map { preferences ->
             Theme.valueOf(preferences[THEME_KEY] ?: DEFAULT_THEME)
         }
@@ -43,7 +43,7 @@ class UserPreferencesRepository @Inject constructor(
         }
     }
 
-    override suspend fun getNotificationTime(): Flow<String> {
+    override  fun getNotificationTime(): Flow<String> {
         return dataStore.data.map { preferences ->
             preferences[NOTIFICATION_TIME_KEY] ?: DEFAULT_NOTIFICATION_TIME
         }
@@ -55,7 +55,7 @@ class UserPreferencesRepository @Inject constructor(
         }
     }
 
-    override suspend fun getFontSize(): Flow<FontSize> {
+    override fun getFontSize(): Flow<FontSize> {
         return dataStore.data.map { preferences ->
             FontSize.valueOf(preferences[FONT_SIZE_KEY] ?: DEFAULT_FONT_SIZE)
         }
@@ -67,7 +67,7 @@ class UserPreferencesRepository @Inject constructor(
         }
     }
 
-    override suspend fun getAccentColor(): Flow<AccentColor> {
+    override fun getAccentColor(): Flow<AccentColor> {
         return dataStore.data.map { preferences ->
             AccentColor.valueOf(preferences[ACCENT_COLOR_KEY] ?: DEFAULT_ACCENT_COLOR)
         }

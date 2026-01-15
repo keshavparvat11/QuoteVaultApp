@@ -58,7 +58,6 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             HomeTopBar(
-                onProfileClick = { navController.navigate("profile") },
                 onSettingsClick = { navController.navigate("settings") }
             )
         },
@@ -193,9 +192,8 @@ fun HomeScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTopBar(
-    onProfileClick: () -> Unit,
     onSettingsClick: () -> Unit,
-    onRefreshClick: () -> Unit = {}
+
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -203,11 +201,7 @@ fun HomeTopBar(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_launcher_background),
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp)
-                )
+
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "QuoteVault",
@@ -217,18 +211,11 @@ fun HomeTopBar(
             }
         },
         actions = {
-            IconButton(onClick = onRefreshClick) {
-                Icon(Icons.Default.Refresh, contentDescription = "Refresh")
-            }
             IconButton(onClick = onSettingsClick) {
                 Icon(Icons.Default.Settings, contentDescription = "Settings")
             }
         },
-        navigationIcon = {
-            IconButton(onClick = onProfileClick) {
-                Icon(Icons.Default.Person, contentDescription = "Profile")
-            }
-        }
+
     )
 }
 
