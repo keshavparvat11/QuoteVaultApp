@@ -12,7 +12,8 @@ interface UserPreferences {
 
     suspend fun setFontSize(fontSize: FontSize)
     suspend fun getFontSize(): Flow<FontSize>
-
+    fun isNotificationEnabled(): Flow<Boolean>
+    suspend fun setNotificationEnabled(enabled: Boolean)
     suspend fun setAccentColor(accentColor: AccentColor)
     suspend fun getAccentColor(): Flow<AccentColor>
 }

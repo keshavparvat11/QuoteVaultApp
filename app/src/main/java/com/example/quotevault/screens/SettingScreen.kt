@@ -1,5 +1,7 @@
 package com.example.quotevault.Screens
 
+import android.content.Context
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.draw.rotate
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,6 +12,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Colorize
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.ThumbUp
@@ -48,6 +53,10 @@ fun SettingsScreen(
     val fontSize by viewModel.fontSize.collectAsState()
     val accentColor by viewModel.accentColor.collectAsState()
     val context = LocalContext.current
+    var showThemeDialog by remember { mutableStateOf(false) }
+    var showFontDialog by remember { mutableStateOf(false) }
+    var showAccentDialog by remember { mutableStateOf(false) }
+    val notificationsEnabled by viewModel.notificationsEnabled.collectAsState()
 
     Scaffold(
         topBar = {
@@ -70,18 +79,18 @@ fun SettingsScreen(
             // Theme Settings
             SettingsCategory(title = "Appearance") {
                 SettingsItem(
-                    icon = Icons.Default.ThumbUp,
+                    icon = Icons.Default.DarkMode,
                     title = "Theme",
                     subtitle = when (theme) {
                         Theme.LIGHT -> "Light"
                         Theme.DARK -> "Dark"
                         Theme.SYSTEM -> "System"
                     },
-                    onClick = { /* Open theme picker */ }
+                    onClick = { showThemeDialog = true }
                 )
 
                 SettingsItem(
-                    icon = Icons.Default.ThumbUp,
+                    icon = Icons.Default.Colorize,
                     title = "Accent Color",
                     subtitle = when (accentColor) {
                         AccentColor.PURPLE -> "Purple"
@@ -90,11 +99,11 @@ fun SettingsScreen(
                         AccentColor.ORANGE -> "Orange"
                         AccentColor.RED -> "Red"
                     },
-                    onClick = { /* Open color picker */ }
+                    onClick = { showAccentDialog = true }
                 )
 
                 SettingsItem(
-                    icon = Icons.Default.KeyboardArrowUp,
+                    icon = Icons.Default.FormatSize,
                     title = "Font Size",
                     subtitle = when (fontSize) {
                         FontSize.SMALL -> "Small"
@@ -102,19 +111,29 @@ fun SettingsScreen(
                         FontSize.LARGE -> "Large"
                         FontSize.XLARGE -> "Extra Large"
                     },
-                    onClick = { /* Open font size picker */ }
+                    onClick = { showFontDialog = true }
                 )
             }
 
             // Notifications
             SettingsCategory(title = "Notifications") {
+
                 SettingsItem(
                     icon = Icons.Default.Notifications,
                     title = "Daily Quote",
-                    subtitle = "Get notified at 09:00",
-                    onClick = {  NotificationScheduler.scheduleDailyQuote(
-                        context = context, hour = 9, minute = 0
-                    )}
+                    subtitle = if (notificationsEnabled)
+                        "Enabled • $notificationTime"
+                    else
+                        "Disabled",
+                    onClick = {}
+                )
+
+                Switch(
+                    checked = notificationsEnabled,
+                    onCheckedChange = {
+                        viewModel.toggleNotifications(context, it)
+                    },
+                    modifier = Modifier.padding(start = 16.dp, bottom = 16.dp)
                 )
             }
 
@@ -127,7 +146,7 @@ fun SettingsScreen(
                     onClick = {
                         viewModel.signOut {
                             navController.navigate("auth") {
-                                popUpTo("home") { inclusive = true }
+                                popUpTo(0)
                             }
                         }
                     },
@@ -160,6 +179,97 @@ fun SettingsScreen(
             }
         }
     }
+    if (showThemeDialog) {
+        AlertDialog(
+            onDismissRequest = { showThemeDialog = false },
+            title = { Text("Choose Theme") },
+            text = {
+                Column {
+                    Theme.values().forEach { option ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp)
+                                .clickable {
+                                    viewModel.updateTheme(option)
+                                    showThemeDialog = false
+                                },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = theme == option,
+                                onClick = null
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(option.name.lowercase().replaceFirstChar { it.uppercase() })
+                        }
+                    }
+                }
+            },
+            confirmButton = {}
+        )
+    }
+    if (showFontDialog) {
+        AlertDialog(
+            onDismissRequest = { showFontDialog = false },
+            title = { Text("Font Size") },
+            text = {
+                Column {
+                    FontSize.values().forEach { size ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp)
+                                .clickable {
+                                    viewModel.updateFontSize(size)
+                                    showFontDialog = false
+                                },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = fontSize == size,
+                                onClick = null
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(size.name)
+                        }
+                    }
+                }
+            },
+            confirmButton = {}
+        )
+    }
+    if (showAccentDialog) {
+        AlertDialog(
+            onDismissRequest = { showAccentDialog = false },
+            title = { Text("Accent Color") },
+            text = {
+                Column {
+                    AccentColor.values().forEach { color ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp)
+                                .clickable {
+                                    viewModel.updateAccentColor(color)
+                                    showAccentDialog = false
+                                },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = accentColor == color,
+                                onClick = null
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(color.name)
+                        }
+                    }
+                }
+            },
+            confirmButton = {}
+        )
+    }
+
 }
 
 @Composable
@@ -262,9 +372,25 @@ class SettingsViewModel @Inject constructor(
 
     private val _notificationTime = MutableStateFlow("09:00")
     val notificationTime: StateFlow<String> = _notificationTime.asStateFlow()
-
+    private val _notificationsEnabled = MutableStateFlow(true)
+    val notificationsEnabled: StateFlow<Boolean> = _notificationsEnabled.asStateFlow()
     private val _fontSize = MutableStateFlow(FontSize.MEDIUM)
     val fontSize: StateFlow<FontSize> = _fontSize.asStateFlow()
+    fun toggleNotifications(
+        context: Context,
+        enabled: Boolean
+    ) {
+        viewModelScope.launch {
+            userPreferences.setNotificationEnabled(enabled)
+
+            if (enabled) {
+                val (h, m) = notificationTime.value.split(":").map { it.toInt() }
+                NotificationScheduler.scheduleDailyQuote(context, h, m)
+            } else {
+                //NotificationScheduler.cancelDailyQuote(context)
+            }
+        }
+    }
 
     private val _accentColor = MutableStateFlow(AccentColor.PURPLE)
     val accentColor: StateFlow<AccentColor> = _accentColor.asStateFlow()
@@ -284,8 +410,8 @@ class SettingsViewModel @Inject constructor(
 
         // Collect notification time
         viewModelScope.launch {
-            userPreferences.getNotificationTime().collect { time ->
-                _notificationTime.value = time
+            userPreferences.isNotificationEnabled().collect {
+                _notificationsEnabled.value = it
             }
         }
 

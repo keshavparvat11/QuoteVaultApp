@@ -72,4 +72,14 @@ class UserPreferencesRepository @Inject constructor(
             AccentColor.valueOf(preferences[ACCENT_COLOR_KEY] ?: DEFAULT_ACCENT_COLOR)
         }
     }
+    private val NOTIFICATION_ENABLED = booleanPreferencesKey("notification_enabled")
+
+    override fun isNotificationEnabled(): Flow<Boolean> =
+        dataStore.data.map { it[NOTIFICATION_ENABLED] ?: true }
+
+    override suspend fun setNotificationEnabled(enabled: Boolean) {
+        dataStore.edit {
+            it[NOTIFICATION_ENABLED] = enabled
+        }
+    }
 }
