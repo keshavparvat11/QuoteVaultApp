@@ -16,7 +16,7 @@ import com.quotevault.presentation.auth.AuthScreen
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.example.quotevault.Screens.QuoteDetailScreen
-import com.example.quotevault.Screens.SearchScreen
+
 import com.example.quotevault.Screens.SettingsScreen
 import com.example.quotevault.Screens.SplashScreen
 import com.example.quotevault.auth.AuthUiState
@@ -55,9 +55,7 @@ fun AppNavigation(
         composable("favorites") {
             FavoritesScreen(navController)
         }
-        composable("search") {
-            SearchScreen(navController)
-        }
+
         composable("settings") {
             SettingsScreen(navController)
         }

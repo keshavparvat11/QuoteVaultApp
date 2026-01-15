@@ -108,17 +108,6 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.height(24.dp))
                     }
 
-                    // Search Bar
-                    item {
-                        SearchBar(
-                            onSearch = { query ->
-                                viewModel.searchQuotes(query)
-                            },
-                            modifier = Modifier.padding(horizontal = 16.dp)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
-
                     // Categories
                     item {
                         CategoriesTabRow(
@@ -145,7 +134,7 @@ fun HomeScreen(
                                 isFavorite = favorites.contains(quote.id),
                                 onFavoriteClick = { viewModel.toggleFavorite(quote.id) },
                                 onShareClick = { /* Share logic */ },
-                                onClick = { navController.navigate("quote/${quote.id}") },
+                                onClick = { },
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                             )
                         }
