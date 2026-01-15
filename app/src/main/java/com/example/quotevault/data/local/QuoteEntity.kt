@@ -32,7 +32,7 @@ data class QuoteEntity(
                 tags = quote.tags,
                 likes = quote.likes,
                 isFeatured = quote.isFeatured,
-                createdAt = System.currentTimeMillis()
+                createdAt = quote.createdAt?.toDate()?.time ?: System.currentTimeMillis()
             )
         }
     }

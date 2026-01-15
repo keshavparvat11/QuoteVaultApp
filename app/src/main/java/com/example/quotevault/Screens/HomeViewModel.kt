@@ -7,11 +7,15 @@ import androidx.lifecycle.viewModelScope
 import com.example.quotevault.data.model.Quote
 import com.example.quotevault.data.model.QuoteCategory
 import com.example.quotevault.data.model.UserPreferences
+import com.example.quotevault.data.seedQuotes
 import com.example.quotevault.quotes.QuoteRepository
-
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel
@@ -58,8 +62,12 @@ class HomeViewModel @Inject constructor(
             viewModelScope.launch {
                 _isLoading.value = true
                 try {
-                    val results = repository.searchQuotes(query)
-                    _quotes.value = results
+                    val result = repository.searchQuotes(query)
+                    if (result.isSuccess) {
+                        _quotes.value = result.getOrNull() ?: emptyList()
+                    } else {
+                        _error.value = result.exceptionOrNull()?.message
+                    }
                 } catch (e: Exception) {
                     _error.value = e.message
                 } finally {
@@ -73,10 +81,18 @@ class HomeViewModel @Inject constructor(
 
     fun loadDailyQuote() {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
-                _dailyQuote.value = repository.getQuoteOfTheDay()
+                val result = repository.getQuoteOfTheDay()
+                if (result.isSuccess) {
+                    _dailyQuote.value = result.getOrNull()
+                } else {
+                    _error.value = result.exceptionOrNull()?.message
+                }
             } catch (e: Exception) {
-                // Use fallback from local
+                _error.value = e.message
+            } finally {
+                _isLoading.value = false
             }
         }
     }
@@ -85,7 +101,12 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                _quotes.value = repository.getQuotes()
+                val result = repository.getQuotes()
+                if (result.isSuccess) {
+                    _quotes.value = result.getOrNull() ?: emptyList()
+                } else {
+                    _error.value = result.exceptionOrNull()?.message
+                }
             } catch (e: Exception) {
                 _error.value = e.message
             } finally {
@@ -98,7 +119,12 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                _quotes.value = repository.getQuotesByCategory(category)
+                val result = repository.getQuotesByCategory(category)
+                if (result.isSuccess) {
+                    _quotes.value = result.getOrNull() ?: emptyList()
+                } else {
+                    _error.value = result.exceptionOrNull()?.message
+                }
             } catch (e: Exception) {
                 _error.value = e.message
             } finally {
@@ -120,9 +146,19 @@ class HomeViewModel @Inject constructor(
             val isFavorite = _favorites.value.contains(quoteId)
             try {
                 if (isFavorite) {
-                    repository.removeFromFavorites(quoteId)
+                    val result = repository.removeFromFavorites(quoteId)
+                    if (result.isSuccess) {
+                        _favorites.value = _favorites.value - quoteId
+                    } else {
+                        _error.value = "Failed to remove from favorites"
+                    }
                 } else {
-                    repository.addToFavorites(quoteId)
+                    val result = repository.addToFavorites(quoteId)
+                    if (result.isSuccess) {
+                        _favorites.value = _favorites.value + quoteId
+                    } else {
+                        _error.value = "Failed to add to favorites"
+                    }
                 }
             } catch (e: Exception) {
                 _error.value = "Failed to update favorites"
@@ -134,4 +170,10 @@ class HomeViewModel @Inject constructor(
         loadQuotes()
         loadDailyQuote()
     }
+    fun seedTestQuote() {
+        viewModelScope.launch {
+            seedQuotes()
+        }
+    }
+
 }

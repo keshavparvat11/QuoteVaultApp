@@ -9,6 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.example.quotevault.data.model.Quote
 import com.example.quotevault.data.model.QuoteCategory
 import com.example.quotevault.data.model.User
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.channels.awaitClose
@@ -212,6 +213,54 @@ class FirebaseRepository @Inject constructor(
             .await()
     }
 
+
+    // Seed Quotes (Run once)
+    suspend fun seedQuotes(quotes: List<Quote>) {
+        val batch = firestore.batch()
+        quotes.forEach { quote ->
+            val docRef = firestore.collection("quotes").document()
+            batch.set(docRef, quote.copy(id = docRef.id))
+        }
+        batch.commit().await()
+    }
+    // Add to your existing FirebaseRepository class
+
+    // Favorites
+    suspend fun getFavoriteQuotes(userId: String): List<Quote> {
+        val favoritesSnapshot = firestore.collection("users").document(userId)
+            .collection("favorites").get().await()
+
+        if (favoritesSnapshot.isEmpty) return emptyList()
+
+        val quoteIds = favoritesSnapshot.documents.map { it.id }
+
+        // Firestore doesn't support IN queries with more than 10 items
+        // So we need to chunk the IDs
+        val quotes = mutableListOf<Quote>()
+
+        quoteIds.chunked(10).forEach { chunk ->
+            val quotesSnapshot = firestore.collection("quotes")
+                .whereIn(FieldPath.documentId(), chunk)
+                .get()
+                .await()
+
+            quotes.addAll(quotesSnapshot.documents.mapNotNull {
+                it.toObject<Quote>()?.copy(id = it.id)
+            })
+        }
+
+        return quotes
+    }
+
+    // Collections
+    suspend fun removeFromCollection(collectionId: String, userId: String, quoteId: String) {
+        firestore.collection("users").document(userId)
+            .collection("collections").document(collectionId)
+            .collection("quotes").document(quoteId)
+            .delete()
+            .await()
+    }
+
     suspend fun getUserCollections(userId: String): List<Collection> {
         val snapshot = firestore.collection("users").document(userId)
             .collection("collections")
@@ -223,13 +272,6 @@ class FirebaseRepository @Inject constructor(
         }
     }
 
-    // Seed Quotes (Run once)
-    suspend fun seedQuotes(quotes: List<Quote>) {
-        val batch = firestore.batch()
-        quotes.forEach { quote ->
-            val docRef = firestore.collection("quotes").document()
-            batch.set(docRef, quote.copy(id = docRef.id))
-        }
-        batch.commit().await()
-    }
+// Also add this import at the top of FirebaseRepository.kt:
+//    import com.google.firebase.firestore.FieldPath
 }

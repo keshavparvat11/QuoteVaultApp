@@ -1,13 +1,18 @@
 package com.example.quotevault.quotes
 
+import android.util.Log
 import com.example.quotevault.data.local.FavoriteEntity
 import com.example.quotevault.data.local.QuoteEntity
 import com.example.quotevault.data.local.dao.QuoteDao
+import com.example.quotevault.data.model.AuthState
+import com.example.quotevault.data.model.Collection
 import com.example.quotevault.data.model.Quote
 import com.example.quotevault.data.model.Quote.Companion.empty
 import com.example.quotevault.data.model.QuoteCategory
 import com.example.quotevault.data.model.User
+import com.example.quotevault.data.model.UserSettings
 import com.example.quotevault.data.remote.FirebaseRepository
+
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
@@ -15,6 +20,9 @@ import kotlinx.coroutines.flow.map
 
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 
 
 class QuoteRepositoryImpl @Inject constructor(
@@ -147,6 +155,15 @@ class QuoteRepositoryImpl @Inject constructor(
             val quotes = firebaseRepository.getQuotesByCategory(category)
             Result.success(quotes)
         } catch (e: Exception) {
+
+            // 🔥 ADD THIS LOG
+            Log.e(
+                "Firestore",
+                "Category query failed for ${category.name}",
+                e
+            )
+
+            // fallback to Room
             try {
                 val localQuotes = quoteDao.getQuotesByCategory(category.name)
                     .map { entities ->
@@ -161,6 +178,7 @@ class QuoteRepositoryImpl @Inject constructor(
             }
         }
     }
+
 
     override suspend fun getQuoteOfTheDay(): Result<Quote> {
         return try {
@@ -245,31 +263,27 @@ class QuoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getFavoriteQuotes(): Result<List<Quote>> {
-        TODO("Not yet implemented")
-    }
+        val userId = firebaseRepository.getCurrentUser()?.uid
+            ?: return Result.failure(Exception("User not logged in"))
 
-//    override suspend fun getFavoriteQuotes(): Result<List<Quote>> {
-//        val userId = firebaseRepository.getCurrentUser()?.uid
-//            ?: return Result.failure(Exception("User not logged in"))
-//
-//        return try {
-//            val quotes = firebaseRepository.getFavoriteQuotes(userId)
-//            Result.success(quotes)
-//        } catch (e: Exception) {
-//            try {
-//                val localQuotes = quoteDao.getFavoriteQuotes(userId)
-//                    .map { entities ->
-//                        entities.map { entity ->
-//                            convertEntityToQuote(entity)
-//                        }
-//                    }
-//                    .firstOrNull() ?: emptyList()
-//                Result.success(localQuotes)
-//            } catch (e2: Exception) {
-//                Result.failure(e2)
-//            }
-//        }
-//    }
+        return try {
+            val quotes = firebaseRepository.getFavoriteQuotes(userId)
+            Result.success(quotes)
+        } catch (e: Exception) {
+            try {
+                val localQuotes = quoteDao.getFavoriteQuotes(userId)
+                    .map { entities ->
+                        entities.map { entity ->
+                            convertEntityToQuote(entity)
+                        }
+                    }
+                    .firstOrNull() ?: emptyList()
+                Result.success(localQuotes)
+            } catch (e2: Exception) {
+                Result.failure(e2)
+            }
+        }
+    }
 
     // Collections
     override suspend fun createCollection(name: String, description: String): Result<String> {
@@ -300,36 +314,28 @@ class QuoteRepositoryImpl @Inject constructor(
         collectionId: String,
         quoteId: String
     ): Result<Unit> {
-        TODO("Not yet implemented")
+        val userId = firebaseRepository.getCurrentUser()?.uid
+            ?: return Result.failure(Exception("User not logged in"))
+
+        return try {
+            firebaseRepository.removeFromCollection(collectionId, userId, quoteId)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     override suspend fun getUserCollections(): Result<List<Collection>> {
-        TODO("Not yet implemented")
+        val userId = firebaseRepository.getCurrentUser()?.uid
+            ?: return Result.failure(Exception("User not logged in"))
+
+        return try {
+            val collections = firebaseRepository.getUserCollections(userId)
+            Result.success(collections)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
-
-//    override suspend fun removeFromCollection(collectionId: String, quoteId: String): Result<Unit> {
-//        val userId = firebaseRepository.getCurrentUser()?.uid
-//            ?: return Result.failure(Exception("User not logged in"))
-//
-//        return try {
-//            firebaseRepository.removeFromCollection(collectionId, userId, quoteId)
-//            Result.success(Unit)
-//        } catch (e: Exception) {
-//            Result.failure(e)
-//        }
-//    }
-
-//    override suspend fun getUserCollections(): Result<List<Collection>> {
-//        val userId = firebaseRepository.getCurrentUser()?.uid
-//            ?: return Result.failure(Exception("User not logged in"))
-//
-//        return try {
-//            val collections = firebaseRepository.getUserCollections(userId)
-//            Result.success(collections)
-//        } catch (e: Exception) {
-//            Result.failure(e)
-//        }
-//    }
 
     // User settings
     override suspend fun updateUserSettings(settings: UserSettings): Result<Unit> {

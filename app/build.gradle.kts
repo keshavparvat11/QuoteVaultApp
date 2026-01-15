@@ -50,9 +50,12 @@ android {
 
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    implementation(libs.firebase.crashlytics.buildtools)
+    implementation(libs.androidx.palette.ktx)
+    implementation(libs.generativeai)
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
-
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.31.5-beta")
     //Firebase
     implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
 

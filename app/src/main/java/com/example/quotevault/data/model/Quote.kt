@@ -1,4 +1,7 @@
 package com.example.quotevault.data.model
+
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.PropertyName
 import kotlinx.serialization.json.Json
 import java.time.LocalDateTime
 
@@ -9,8 +12,10 @@ data class Quote(
     val category: QuoteCategory = QuoteCategory.MOTIVATION,
     val tags: List<String> = emptyList(),
     val likes: Int = 0,
-    val createdAt: LocalDateTime = LocalDateTime.now(),
-    val isFeatured: Boolean = false
+    val createdAt: Timestamp? = null,
+    @get:PropertyName("isFeatured")
+    @set:PropertyName("isFeatured")
+    var isFeatured: Boolean = false,
 ) {
     companion object {
         val empty = Quote()
